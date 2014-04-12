@@ -49,18 +49,13 @@ class Appendage:
         self.elasticity = r.random()
 
 class Caveman(base.Fitness):    
-    def __init__(self, numApp, w):
+    def __init__(self, numApp):
 
-        self.weights = w
+        # self.weights = w
         self.nAppendages = numApp
         self.hBody = HEIGHT
 
         self.arm_height = r.uniform(MINIMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
-<<<<<<< HEAD
-=======
-        print "satr"
-        print self.arm_height
->>>>>>> 65f078d95e696a6a4485d6e75558425af2179cbf
         
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)
