@@ -10,18 +10,21 @@ def create_caveman(world, x_pos, caveman):
     mbody = world.CreateDynamicBody(position=(x_pos, cm.HEIGHT/2))
     mbody_density = caveman.wBody / 2 *(1 * cm.HEIGHT/2)
     box = mbody.CreatePolygonFixture(box=(1, cm.HEIGHT/2), density=mbody_density , friction=0.3)
+    box.filterData.groupIndex = -x_pos
 
     a1, a2 = caveman.appendages
 
     bicep_body = world.CreateDynamicBody(position=(x_pos+a1.lBicep/2, caveman.arm_height), angle=pi/2)
     bicep_density = a1.wBicep / 2*(0.5 * a1.lBicep)
     bicep = bicep_body.CreatePolygonFixture(box=(0.5, a1.lBicep/2), density=bicep_density, friction=0.3)
+    bicep.filterData.groupIndex = -x_pos
     joint1 = world.CreateRevoluteJoint(bodyA=mbody, bodyB=bicep_body, localAnchorA=(0,caveman.arm_height - cm.HEIGHT/2.0) , localAnchorB=(0, a1.lBicep/2), lowerAngle = -pi, upperAngle = pi, enableMotor=True)
 
     forearm_width = 0.5
     forearm_body = world.CreateDynamicBody(position=(x_pos+a1.lBicep, caveman.arm_height), angle=pi/2)
     forearm_density = a1.wForearm / 2*(0.5 * a1.lForearm)
     forearm = forearm_body.CreatePolygonFixture(box=(0.5, a1.lForearm/2), density=forearm_density, friction=0.3)
+    forearm.filterData.groupIndex = -x_pos
 
     joint2=world.CreateRevoluteJoint(bodyA=bicep_body, bodyB=forearm_body, localAnchorA=(0, -a1.lBicep/2), localAnchorB=(0, a1.lForearm/2), lowerAngle=-pi, upperAngle = pi)
 
@@ -31,20 +34,22 @@ def create_caveman(world, x_pos, caveman):
     bopper = bopper_body.CreateCircleFixture(radius=bopper_radius, density=bopper_density, friction=0.3)
     joint3=world.CreateRevoluteJoint(bodyA=forearm_body, bodyB=bopper_body, localAnchorA=(0, -a1.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
 
-    bicep2_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep/2, caveman.arm_height), angle=pi/2)
+    bicep2_body2 = world.CreateDynamicBody(position=(x_pos-a2.lBicep/2, caveman.arm_height), angle= -pi/2)
     bicep2_density2 = a2.wBicep / 2*(0.5 * a2.lBicep)
     bicep2 = bicep2_body2.CreatePolygonFixture(box=(0.5, a2.lBicep/2), density=bicep2_density2, friction=0.3)
+    bicep2.filterData.groupIndex = -x_pos
     joint12 = world.CreateRevoluteJoint(bodyA=mbody, bodyB=bicep2_body2, localAnchorA=(0,caveman.arm_height - cm.HEIGHT/2.0) , localAnchorB=(0, a2.lBicep/2), lowerAngle = -pi, upperAngle = pi, enableMotor=True)
 
     forearm_width2 = 0.5
-    forearm_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep, caveman.arm_height), angle=pi/2)
+    forearm_body2 = world.CreateDynamicBody(position=(x_pos-a2.lBicep, caveman.arm_height), angle= -pi/2)
     forearm_density2 = a2.wForearm / 2*(0.5 * a2.lForearm)
     forearm2= forearm_body2.CreatePolygonFixture(box=(0.5, a2.lForearm/2), density=forearm_density2, friction=0.3)
+    forearm2.filterData.groupIndex = -x_pos
 
     joint22=world.CreateRevoluteJoint(bodyA=bicep2_body2, bodyB=forearm_body2, localAnchorA=(0, -a2.lBicep/2), localAnchorB=(0, a2.lForearm/2), lowerAngle=-pi, upperAngle = pi)
 
     bopper_radius2 = a2.rBopper
-    bopper_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep+a2.lForearm, caveman.arm_height), angle=0)
+    bopper_body2 = world.CreateDynamicBody(position=(x_pos-a2.lBicep-a2.lForearm, caveman.arm_height), angle=0)
     bopper_density2 = a2.wBopper / pi*(a2.rBopper)**2
     bopper2 = bopper_body2.CreateCircleFixture(radius=bopper_radius2, density=bopper_density2, friction=0.3)
     joint3=world.CreateRevoluteJoint(bodyA=forearm_body2, bodyB=bopper_body2, localAnchorA=(0, -a2.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
@@ -72,7 +77,7 @@ def simulate(caveman1, caveman2, graphics_enabled):
     bodies1_1 = bodies1_1[:-2]
     joint1_2 = bodies1_2[-2:]
     bodies1_2 = bodies1_2[:-2]
-    bodies2_1, bodies2_2 = create_caveman(world, 15, caveman2)
+    bodies2_1, bodies2_2 = create_caveman(world, 12, caveman2)
     bodies2_1 = bodies2_1[:-2]
     joint2_1 = bodies2_1[-2:]
     bodies2_2 = bodies2_2[:-2]
