@@ -1,0 +1,9 @@
+Creator creates other classes,
+("classname", superclass, weights(1.0,1.0, .. -1.0)
+	      If the weights are positive, it attempts to maximize the positive values, and minimze the negative weights. the relative weights can be used the set the relative importance of the weights.
+
+
+toolbox.register("attr_float", random.random)
+toolbox.register("individual", tools.initRepeat, creator.Individual,
+                 toolbox.attr_float, n=IND_SIZE)
+registers individual -> initRepeat(Individual.__init__(), toolbox.attr_float, IND_SIZE)
