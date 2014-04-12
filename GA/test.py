@@ -19,7 +19,7 @@ cutoff = 2
 
 def evaluate(individual1, individual2):
     #have fight, return winner.
-    return individua11
+    return individual1
 
 def ispower(n, base):
     assert(n > 0)
@@ -57,14 +57,16 @@ def fightTournament(population, numWinners):
     assert(ispower(numWinners, 2))
 
     totalrounds = powerof(length , 2)
-    endround = powerof(length, 2)
+    endround = powerof(numWinners, 2)
     numrounds = totalrounds - endround
 
-    chosen = np.array(population)
+    chosen = population
     for i in xrange(numrounds):
         chosen = map(evaluate, chosen[0::2], chosen[1::2])
+        #print chosen
     return chosen
-        
+
+fightTournament(population, 2)
     
 toolbox = base.Toolbox()
 #creates a function toolbox.individual() that calls Caveman(NUM_APP)

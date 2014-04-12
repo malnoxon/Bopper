@@ -12,6 +12,8 @@ NUM_POINTS = 3
 MINIMUM_LENGTH_FOREARM = 2
 MAXIMUM_LENGTH_FOREARM = 5
 
+MINIMUM_FORCE = -3
+MAXIMUM_FORCE = 3
 
 MINIMUM_LENGTH_BICEP = 2
 MAXIMUM_LENGTH_BICEP = 4
@@ -37,11 +39,11 @@ class Appendage:
         self.wBopper = wBop
 
         x = np.linspace(0, 1.0, num = NUM_POINTS)
-        y = np.array([r.uniform(-1, 1) for _ in xrange(NUM_POINTS - 1)])
+        y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
         self.iElbow = np.poly1d(np.polyfit(x, y, NUM_POINTS))
         x = np.linspace(0, 1.0, num = NUM_POINTS)
-        y = np.array([r.uniform(-1, 1) for _ in xrange(NUM_POINTS - 1)])
+        y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
         self.iShoulder = np.poly1d(np.polyfit(x, y, NUM_POINTS))
 
@@ -56,7 +58,6 @@ class Caveman(base.Fitness):
         self.hBody = HEIGHT
 
         self.arm_height = r.uniform(MINIMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
-        
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)
         self.wBody = MAXIMUM_WEIGHT_CAVEMAN * actProp
