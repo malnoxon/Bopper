@@ -77,7 +77,7 @@ def simulate(caveman1, caveman2, graphics_enabled):
     joint2_1 = bodies2_1[-2:]
     bodies2_2 = bodies2_2[:-2]
     joint2_2 = bodies2_2[-2:]
-    all_bodies = bodies1_1 + bodies2_1 + [groundBody] + bodies2_1 + bodies2_2
+    all_bodies = bodies1_1 + bodies2_1 + [groundBody] + bodies1_2 + bodies2_2
 
     boppers = [bodies1_1[3], bodies2_1[3], bodies1_2[3], bodies2_2[3]]
     bodies1_1 = bodies1_1[:-1]
