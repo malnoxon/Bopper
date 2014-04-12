@@ -24,8 +24,8 @@ MAXIMUM_LENGTH_STRING = 0
 MINIMUM_RADIUS_BOPPER = 1
 MAXIMUM_RADIUS_BOPPER = 1
 
-MINIMUM_HEIGHT_ARMS = HEIGHT * (3/4)
-MAXIMUM_HEIGHT_ARMS = HEIGHT * (3/4)
+MINIMUM_HEIGHT_ARMS = HEIGHT * (3.0/4)
+MAXIMUM_HEIGHT_ARMS = HEIGHT * (3.0/4)
 
 class Appendage:
     def __init__(self, wFor, wBic, wBop):
@@ -41,11 +41,11 @@ class Appendage:
         x = np.linspace(0, 1.0, num = NUM_POINTS)
         y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
-        self.iElbow = np.poly1d(np.polyfit(x, y, NUM_POINTS))
+        self.iElbow = np.poly1d(np.polyfit(x, y, 10))
         x = np.linspace(0, 1.0, num = NUM_POINTS)
         y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
-        self.iShoulder = np.poly1d(np.polyfit(x, y, NUM_POINTS))
+        self.iShoulder = np.poly1d(np.polyfit(x, y, 10))
 
         #set elasticiy
         self.elasticity = r.random()
@@ -57,7 +57,7 @@ class Caveman(base.Fitness):
         self.nAppendages = numApp
         self.hBody = HEIGHT
 
-        self.arm_height = r.uniform(MINIMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
+        self.arm_height = r.uniform(MAXIMUM_HEIGHT_ARMS, MINIMUM_HEIGHT_ARMS)
 
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)
