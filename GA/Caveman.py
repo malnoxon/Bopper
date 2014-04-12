@@ -50,6 +50,8 @@ class Caveman:
     def __init__(self, numApp):
         self.nAppendages = numApp
         self.hBody = HEIGHT
+
+        self.arm_height = r.uniform(MINUMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
         
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)
