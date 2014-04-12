@@ -1,23 +1,22 @@
-from __future__ import division
 import random as r
 from scipy import interpolate
 import numpy as np
 from deap import base
 
-MAXIMUM_WEIGHT_CAVEMAN = 5
-HEIGHT = 10
+MAXIMUM_WEIGHT_CAVEMAN = 1
+HEIGHT = 5
 BODY_WEIGHT_PROPORTION = 0.75
 NUM_POINTS = 3
 
-MINIMUM_LENGTH_FOREARM = 2
-MAXIMUM_LENGTH_FOREARM = 5
+MINIMUM_LENGTH_FOREARM = 0.5
+MAXIMUM_LENGTH_FOREARM = 1
 
 
-MINIMUM_LENGTH_BICEP = 2
-MAXIMUM_LENGTH_BICEP = 4
+MINIMUM_LENGTH_BICEP = 0.5
+MAXIMUM_LENGTH_BICEP = 1
 
-MINIMUM_LENGTH_STRING = 0
-MAXIMUM_LENGTH_STRING = 0
+MINIMUM_LENGTH_STRING = 0.5
+MAXIMUM_LENGTH_STRING = 1
 
 MINIMUM_RADIUS_BOPPER = 1
 MAXIMUM_RADIUS_BOPPER = 1
@@ -56,11 +55,6 @@ class Caveman(base.Fitness):
         self.hBody = HEIGHT
 
         self.arm_height = r.uniform(MINIMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
-<<<<<<< HEAD
-=======
-        print "satr"
-        print self.arm_height
->>>>>>> 65f078d95e696a6a4485d6e75558425af2179cbf
         
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)

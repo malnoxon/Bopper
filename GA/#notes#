@@ -6,4 +6,4 @@ Creator creates other classes,
 toolbox.register("attr_float", random.random)
 toolbox.register("individual", tools.initRepeat, creator.Individual,
                  toolbox.attr_float, n=IND_SIZE)
-registers individual -> initRepeat(Individual.__init__(), toolbox.attr_float, IND_SIZE)
+registers individual -> initRepeat(Individual.__init__(), toolbox.attr_float, IND_SIZE)x
