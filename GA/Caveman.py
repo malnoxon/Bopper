@@ -51,11 +51,12 @@ class Appendage:
         self.elasticity = r.random()
 
 class Caveman(base.Fitness):    
-    def __init__(self, numApp, w):
+    def __init__(self, numApp):
 
-        self.weights = w
+        # self.weights = w
         self.nAppendages = numApp
         self.hBody = HEIGHT
+
 
         self.arm_height = r.uniform(MAXIMUM_HEIGHT_ARMS, MINIMUM_HEIGHT_ARMS)
 
