@@ -31,26 +31,25 @@ def create_caveman(world, x_pos, caveman):
     bopper = bopper_body.CreateCircleFixture(radius=bopper_radius, density=bopper_density, friction=0.3)
     joint3=world.CreateRevoluteJoint(bodyA=forearm_body, bodyB=bopper_body, localAnchorA=(0, -a1.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
 
-    bicep2_body2 = world.CreateDynamicBody(position=(x_pos+a1.lBicep/2, caveman.arm_height), angle=pi/2)
-    bicep2_density2 = a1.wBicep / 2*(0.5 * a1.lBicep)
-    bicep2 = bicep_body2.CreatePolygonFixture(box=(0.5, a1.lBicep/2), density=bicep_density2, friction=0.3)
-    joint12 = world.CreateRevoluteJoint(bodyA=mbody, bodyB=bicep2_body2, localAnchorA=(0,caveman.arm_height - cm.HEIGHT/2.0) , localAnchorB=(0, a1.lBicep/2), lowerAngle = -pi, upperAngle = pi, enableMotor=True)
+    bicep2_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep/2, caveman.arm_height), angle=pi/2)
+    bicep2_density2 = a2.wBicep / 2*(0.5 * a2.lBicep)
+    bicep2 = bicep2_body2.CreatePolygonFixture(box=(0.5, a2.lBicep/2), density=bicep2_density2, friction=0.3)
+    joint12 = world.CreateRevoluteJoint(bodyA=mbody, bodyB=bicep2_body2, localAnchorA=(0,caveman.arm_height - cm.HEIGHT/2.0) , localAnchorB=(0, a2.lBicep/2), lowerAngle = -pi, upperAngle = pi, enableMotor=True)
 
     forearm_width2 = 0.5
-    forearm_body2 = world.CreateDynamicBody(position=(x_pos+a1.lBicep, caveman.arm_height), angle=pi/2)
-    forearm_density2 = a1.wForearm / 2*(0.5 * a1.lForearm)
-    forearm2= forearm_body2.CreatePolygonFixture(box=(0.5, a1.lForearm/2), density=forearm_density2, friction=0.3)
+    forearm_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep, caveman.arm_height), angle=pi/2)
+    forearm_density2 = a2.wForearm / 2*(0.5 * a2.lForearm)
+    forearm2= forearm_body2.CreatePolygonFixture(box=(0.5, a2.lForearm/2), density=forearm_density2, friction=0.3)
 
-    joint22=world.CreateRevoluteJoint(bodyA=bicep2_body2, bodyB=forearm_body2, localAnchorA=(0, -a1.lBicep/2), localAnchorB=(0, a1.lForearm/2), lowerAngle=-pi, upperAngle = pi)
+    joint22=world.CreateRevoluteJoint(bodyA=bicep2_body2, bodyB=forearm_body2, localAnchorA=(0, -a2.lBicep/2), localAnchorB=(0, a2.lForearm/2), lowerAngle=-pi, upperAngle = pi)
 
-    bopper_radius = a1.rBopper
-    bopper_body = world.CreateDynamicBody(position=(x_pos+a1.lBicep+a1.lForearm, caveman.arm_height), angle=0)
-    bopper_density = a1.wBopper / pi*(a1.rBopper)**2
-    bopper = bopper_body.CreateCircleFixture(radius=bopper_radius, density=bopper_density, friction=0.3)
-    joint3=world.CreateRevoluteJoint(bodyA=forearm_body2, bodyB=bopper_body, localAnchorA=(0, -a1.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
+    bopper_radius2 = a2.rBopper
+    bopper_body2 = world.CreateDynamicBody(position=(x_pos+a2.lBicep+a2.lForearm, caveman.arm_height), angle=0)
+    bopper_density2 = a2.wBopper / pi*(a2.rBopper)**2
+    bopper2 = bopper_body2.CreateCircleFixture(radius=bopper_radius2, density=bopper_density2, friction=0.3)
+    joint3=world.CreateRevoluteJoint(bodyA=forearm_body2, bodyB=bopper_body2, localAnchorA=(0, -a2.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
 
-
-    return ([mbody, bicep_body, forearm_body, bopper_body, joint1, joint2], [mbody2, bicep_body2, forearm_body2, bopper_body2, joint12, joint22])
+    return ([mbody, bicep_body, forearm_body, bopper_body, joint1, joint2], [mbody, bicep2_body2, forearm_body2, bopper_body2, joint12, joint22])
 
 def simulate(caveman1, caveman2, graphics_enabled):
 
@@ -73,18 +72,18 @@ def simulate(caveman1, caveman2, graphics_enabled):
     bodies1_1 = bodies1_1[:-2]
     joint1_2 = bodies1_2[-2:]
     bodies1_2 = bodies1_2[:-2]
-    bodies2_1, bodies2_1 = create_caveman(world, 15, caveman2)
+    bodies2_1, bodies2_2 = create_caveman(world, 15, caveman2)
     bodies2_1 = bodies2_1[:-2]
     joint2_1 = bodies2_1[-2:]
     bodies2_2 = bodies2_2[:-2]
     joint2_2 = bodies2_2[-2:]
     all_bodies = bodies1_1 + bodies2_1 + [groundBody] + bodies2_1 + bodies2_2
 
-    boppers = [bodies1_1[3], bodies2_1[3], bodies2_1[3], bodies2_2[3]]
-    bodies1_1 = bodies1[:-1]
-    bodies2_1 = bodies2[:-1]
-    bodies1_2 = bodies1[:-1]
-    bodies2_2 = bodies2[:-1]
+    boppers = [bodies1_1[3], bodies2_1[3], bodies1_2[3], bodies2_2[3]]
+    bodies1_1 = bodies1_1[:-1]
+    bodies2_1 = bodies2_1[:-1]
+    bodies1_2 = bodies1_2[:-1]
+    bodies2_2 = bodies2_2[:-1]
     
     timeStep = 1.0 / FPS
     vel_iters = 6
