@@ -1,3 +1,4 @@
+from __future__ import division
 import random as r
 from scipy import interpolate
 import numpy as np
@@ -52,6 +53,8 @@ class Caveman:
         self.hBody = HEIGHT
 
         self.arm_height = r.uniform(MINIMUM_HEIGHT_ARMS, MAXIMUM_HEIGHT_ARMS)
+        print "satr"
+        print self.arm_height
         
         #sample the body weight between 0 and MAXIMUM_WEIGHT_CAVEMAN * BODY_WEIGHT_PROPORTION
         actProp = r.uniform(BODY_WEIGHT_PROPORTION, 0)
