@@ -41,11 +41,11 @@ class Appendage:
         x = np.linspace(0, 1.0, num = NUM_POINTS)
         y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
-        self.iElbow = np.poly1d(np.polyfit(x, y, 10))
+        self.iElbow = np.poly1d(np.polyfit(x, y, NUM_POINTS))
         x = np.linspace(0, 1.0, num = NUM_POINTS)
         y = np.array([r.uniform(MAXIMUM_FORCE, MINIMUM_FORCE) for _ in xrange(NUM_POINTS - 1)])
         y = np.append(y, y[0])
-        self.iShoulder = np.poly1d(np.polyfit(x, y, 10))
+        self.iShoulder = np.poly1d(np.polyfit(x, y, NUM_POINTS))
 
         #set elasticiy
         self.elasticity = r.random()
