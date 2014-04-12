@@ -4,6 +4,7 @@ from Box2D.b2 import *
 import pygame
 from pygame.locals import *
 import GA.Caveman as cm
+import numpy as np
 
 def create_caveman(world, x_pos, caveman):
     mbody = world.CreateDynamicBody(position=(x_pos, cm.HEIGHT/2))
@@ -31,7 +32,7 @@ def create_caveman(world, x_pos, caveman):
     bopper = bopper_body.CreateCircleFixture(radius=bopper_radius, density=bopper_density, friction=0.3)
     joint3=world.CreateRevoluteJoint(bodyA=forearm_body, bodyB=bopper_body, localAnchorA=(0, -a1.lForearm/2), localAnchorB=(0,0), lowerAngle=-pi, upperAngle=pi)
 
-    return [mbody, bicep_body, forearm_body, bopper_body]
+    return [mbody, bicep_body, forearm_body, bopper_body, joint1, joint2]
 
 def simulate(caveman1, caveman2, graphics_enabled):
 
@@ -50,29 +51,41 @@ def simulate(caveman1, caveman2, graphics_enabled):
             shapes=b2PolygonShape(box=(50,10)))
 
     bodies1 = create_caveman(world, 5, caveman1)
-    bodies2 = create_caveman(world, 25, caveman2)
+    joint1 = bodies1[-2:]
+    bodies1 = bodies1[:-2]
+    bodies2 = create_caveman(world, 10, caveman2)
+    bodies2 = bodies2[:-2]
+    joint2 = bodies2[-2:]
     all_bodies = bodies1 + bodies2 + [groundBody]
 
     boppers = [bodies1[3], bodies2[3]]
     bodies1 = bodies1[:-1]
     bodies2 = bodies2[:-1]
     
-
-
     timeStep = 1.0 / FPS
     vel_iters = 6
     pos_iters = 2
 
     running = True
     while running:
+        # np.polynomial.polynomial.polyval(1, caveman1.appendages[0].iElbow)
+        # Motors for first arm of first robot
+        joint1[0].maxMotorTorque = 1000
+        joint1[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[0].iShoulder)
+        joint1[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[0].iElbow)
+
+        #Motors for first arm of 2nd robot
+        joint2[0].maxMotorTorque = 1000
+        joint2[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[0].iShoulder)
+        joint2[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[0].iElbow)
+
+
+        print np.polynomial.polynomial.polyval(clock.get_time()*100, caveman1.appendages[0].iElbow)
         screen.fill((0,0,0,0))
 
-        print "--------------"
         for body in all_bodies:
             for fixture in body.fixtures:
                 shape = fixture.shape
-                # print shape
-                print body
                 if body not in boppers:
                     vertices = [(body.transform*v)*PPM for v in shape.vertices]
                     vertices = [(v[0], SCREEN_HEIGHT-v[1]) for v in vertices]
@@ -90,11 +103,6 @@ def simulate(caveman1, caveman2, graphics_enabled):
         world.Step(timeStep, vel_iters, pos_iters)
         pygame.display.flip()
         clock.tick(FPS)
-
-        # print(mbody.position, mbody.angle)
-        # print(bicep_body.position, bicep_body.angle)
-
-        #TODO: add in little ball on end and modularize for arbitrary data
 
 if __name__ == "__main__":
     simulate(cm.Caveman(2), cm.Caveman(2), True)
