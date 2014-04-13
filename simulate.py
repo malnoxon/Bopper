@@ -211,4 +211,29 @@ def simulate(caveman1, caveman2, graphics_enabled=False):
                 return caveman2
 
 if __name__ == "__main__":
-    simulate(cm.Caveman(2), cm.Caveman(2), False)
+    # simulate(cm.Caveman(2), cm.Caveman(2), True)
+    d1 = [3.3896, 4.31, 3.918, 0.8, -0.2, -0.2, 0.4545, 0.25559, 4.5407, 2.338, 1.1, -0.1, -0.1, 0.802, 1.078]
+
+    d2 = []
+    
+    simulate(cm.Caveman(2), cm.Caveman(2, d1), True)
+
+
+    # ---------wBody 3.38965624916
+    # Arm 0
+    # lForearm 4.31061225347
+    # lBicep 3.91820060486
+    # rBopper 0.8
+    # lString -0.2
+    # wForearm -0.2
+    # wBicep 0.454519404991
+    # wBopper 0.255939162984
+    # Arm 1
+    # lForearm 4.54071250914
+    # lBicep 2.33839279826
+    # rBopper 1.1
+    # lString -0.1
+    # wForearm -0.1
+    # wBicep 0.802588997549
+    # wBopper 1.0787341147
+    # k
