@@ -3,7 +3,7 @@ from Box2D import *
 from Box2D.b2 import *
 import pygame
 from pygame.locals import *
-import GA.Caveman as cm
+import Caveman as cm
 import numpy as np
 import sys
 
@@ -72,8 +72,9 @@ def simulate(caveman1, caveman2, graphics_enabled):
     FPS = 60
     SCREEN_WIDTH, SCREEN_HEIGHT=640,480
     
-    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), 0, 32)
-    pygame.display.set_caption("Bopper")
+    if graphics_enabled:
+        screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), 0, 32)
+        pygame.display.set_caption("Bopper")
     clock = pygame.time.Clock()
 
 
@@ -111,38 +112,41 @@ def simulate(caveman1, caveman2, graphics_enabled):
     pos_iters = 2
 
     total_time = 0
+    time_param = 0
 
     running = True
     while running:
+        time_param += 1
 
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    import pdb; pdb.set_trace()
+        if graphics_enabled:
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        import pdb; pdb.set_trace()
 
 
         # import pdb; pdb.set_trace()
         # np.polynomial.polynomial.polyval(1, caveman1.appendages[0].iElbow)
         # Motors for first arm of first robot
         joint1_1[0].maxMotorTorque = 1000
-        joint1_1[0].motorSpeed =2* np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint1_1[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint1_1[0].motorSpeed =1* np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iShoulder)
+        joint1_1[1].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iElbow)
 
         #Motors for first arm of 2nd robot
         joint2_1[0].maxMotorTorque = 1000
-        joint2_1[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint2_1[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint2_1[0].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iShoulder)
+        joint2_1[1].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iElbow)
 
         # Motors for second arm of first robot
         joint1_2[0].maxMotorTorque = 1000
-        joint1_2[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint1_2[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint1_2[0].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iShoulder)
+        joint1_2[1].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iElbow)
 
         #Motors for second arm of 2nd robot
         joint2_2[0].maxMotorTorque = 1000
-        joint2_2[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint2_2[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint2_2[0].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iShoulder)
+        joint2_2[1].motorSpeed = 1*np.polynomial.polynomial.polyval(time_param % 50, caveman1.appendages[1].iElbow)
 
         # print np.polynomial.polynomial.polyval(clock.get_time()*100, caveman1.appendages[0].iElbow)
 
@@ -166,7 +170,8 @@ def simulate(caveman1, caveman2, graphics_enabled):
                         pygame.draw.circle(screen, (255,0,0,255), pygame_loc, int(pygame_radius))
 
         world.Step(timeStep, vel_iters, pos_iters)
-        pygame.display.flip()
+        if graphics_enabled:
+            pygame.display.flip()
         total_time += clock.get_time()
         clock.tick(FPS)
 
@@ -174,9 +179,11 @@ def simulate(caveman1, caveman2, graphics_enabled):
             for contact in b.contacts:
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
+                        return (caveman2, total_time)
                         print "Player 1 loses"
                         endgame(screen)
                     if b is mbody and mbody.worldCenter[1] < 2.03:
+                        return (caveman2, total_time)
                         print "Player 1 loses"
                         endgame(screen)
 
@@ -184,20 +191,24 @@ def simulate(caveman1, caveman2, graphics_enabled):
             for contact in b.contacts:
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
+                        return (caveman1, total_time)
                         print "Player 2 loses"
                         endgame(screen)
                         # import pdb; pdb.set_trace()
                     if b is mbody2 and mbody2.worldCenter[1] < 2.03:
+                        return (caveman1, total_time)
                         print "Player 2 loses"
                         endgame(screen)
                         # import pdb; pdb.set_trace()
 
-        if total_time > 200000: #Tie after 100 seconds
+        if total_time > 200000:
             print "Draw, result returned is:"
             if mbody.worldCenter[1] > mbody2.worldCentes[1]:
+                return (caveman1, total_time)
                 print "Player 1 wins"
             else:
+                return (caveman2, total_time)
                 print "Player 2 wins"
 
 if __name__ == "__main__":
-    simulate(cm.Caveman(2), cm.Caveman(2), True)
+    simulate(cm.Caveman(2), cm.Caveman(2), False)
