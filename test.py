@@ -177,3 +177,7 @@ nxtGen = fightTournament(population, ROUND_CUTOFF)
 derp = mate(nxtGen)
 
 herp = mutate(derp[0])
+
+def runtrial(numtrials):
+    for i in numtrials:
+        fightTournament(population, ROUND_CUTOFF
