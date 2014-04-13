@@ -66,7 +66,7 @@ def create_caveman(world, x_pos, caveman):
 
     return ([mbody, bicep_body, forearm_body, bopper_body, joint1, joint2], [mbody, bicep2_body2, forearm_body2, bopper_body2, joint12, joint22])
 
-def simulate(caveman1, caveman2, graphics_enabled):
+def simulate(caveman1, caveman2, graphics_enabled=False):
 
     PPM = 20.0 # pixels per meter
     FPS = 60
@@ -179,36 +179,36 @@ def simulate(caveman1, caveman2, graphics_enabled):
             for contact in b.contacts:
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
-                        return (caveman2, total_time)
                         print "Player 1 loses"
+                        return caveman2
                         endgame(screen)
                     if b is mbody and mbody.worldCenter[1] < 2.03:
-                        return (caveman2, total_time)
                         print "Player 1 loses"
+                        return caveman2
                         endgame(screen)
 
         for b in game_over_bodies2:
             for contact in b.contacts:
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
-                        return (caveman1, total_time)
                         print "Player 2 loses"
+                        return caveman1
                         endgame(screen)
                         # import pdb; pdb.set_trace()
                     if b is mbody2 and mbody2.worldCenter[1] < 2.03:
-                        return (caveman1, total_time)
                         print "Player 2 loses"
+                        return caveman1
                         endgame(screen)
                         # import pdb; pdb.set_trace()
 
-        if total_time > 200000:
+        if total_time > 15000:
             print "Draw, result returned is:"
-            if mbody.worldCenter[1] > mbody2.worldCentes[1]:
-                return (caveman1, total_time)
+            if mbody.worldCenter[1] > mbody2.worldCenter[1]:
                 print "Player 1 wins"
+                return caveman1
             else:
-                return (caveman2, total_time)
                 print "Player 2 wins"
+                return caveman2
 
 if __name__ == "__main__":
     simulate(cm.Caveman(2), cm.Caveman(2), False)

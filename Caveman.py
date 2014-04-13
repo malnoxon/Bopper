@@ -56,7 +56,7 @@ class Caveman():
     def __init__(self, numApp):
 
         self.weights = (1,)
-        self.nAppendages = numApp
+        # self.nAppendages = numApp
         self.hBody = HEIGHT
 
 

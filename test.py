@@ -5,6 +5,9 @@ import pdb
 import simulate
 import copy
 
+import warnings 
+warnings.filterwarnings("ignore")
+
 """
 #from deap import base
 #from deap import creator
@@ -14,13 +17,13 @@ import copy
 NUM_APP = 2
 
 #size of the population
-POPULATION_SIZE = 64
+POPULATION_SIZE = 16
 
 #number of generations
 NGEN = 10
 
 #number of rounds from the end the tournament cuts off.
-ROUND_CUTOFF = 2
+ROUND_CUTOFF = 3
 
 #probability of a mutation occuring on a given trait.
 MUTATION_RATE = 0.15
@@ -70,7 +73,7 @@ def fightTournament(population, numWinners):
 
     chosen = population
     for i in xrange(numrounds):
-        chosen = map(simulate.simulate, chosen[0::2], chosen[1::2], False)
+        chosen = map(simulate.simulate, chosen[0::2], chosen[1::2])
     
     
     return chosen
@@ -100,9 +103,11 @@ def mutate(genList, branchingFactor):
     assert(powerof(len(genList), 2))
     assert(powerof(branchingFactor, 2))
     ret = []
-    for j in len(genList):
-        for i in branchingFactor:
+    for j in xrange(len(genList)):
+        for i in xrange(branchingFactor):
             ret.append(copy.deepcopy(genList[j]))
+
+    # print "HESTRSTRTRDRDDR {}".format(str(len(ret)))
     
     for nxt in ret:
     #the list of appendages in next
@@ -129,36 +134,39 @@ def mutate(genList, branchingFactor):
                                 dictval[k] -= MUTATION_AMOUNT
                             else:
                                 dictval[k] += MUTATION_AMOUNT
-    return ret
                             
-    #going through the fields in nxt.
-    nextdict = nxt.__dict__
-    for i in nextdict.keys():
-        if not i == 'appendages':
-            #pdb.set_trace()
-            dictval = eval("nextdict['" + i + "']")
-            if (isinstance(dictval, float) or isinstance(dictval, int)):
-                rand = r.random()
-                if rand < MUTATION_RATE:
-                    if r.random() < 0.5:
-                        exec "nxt." + i + " -= MUTATION_AMOUNT" 
-                    else:
-                        exec "nxt." + i + " += MUTATION_AMOUNT"
-                        if (isinstance(dictval, np.poly1d)):
-                            for k in xrange(len(dictval) + 1):
-                                rand = r.random()
-                                if rand < MUTATION_RATE:
-                                    if r.random() < 0.5:
-                                        dictval[k] -= MUTATION_AMOUNT
-                                    else:
-                                        dictval[k] += MUTATION_AMOUNT
-                                        return nxt
+        #going through the fields in nxt.
+        nextdict = nxt.__dict__
+        for i in nextdict.keys():
+            if not i == 'appendages' and not i == 'nAppendages':
+                #pdb.set_trace()
+                dictval = eval("nextdict['" + i + "']")
+                if (isinstance(dictval, float) or isinstance(dictval, int)):
+                    rand = r.random()
+                    if rand < MUTATION_RATE:
+                        if r.random() < 0.5:
+                            exec "nxt." + i + " -= MUTATION_AMOUNT" 
+                        else:
+                            exec "nxt." + i + " += MUTATION_AMOUNT"
+                if (isinstance(dictval, np.poly1d)):
+                    for k in xrange(len(dictval) + 1):
+                        rand = r.random()
+                        if rand < MUTATION_RATE:
+                            if r.random() < 0.5:
+                                dictval[k] -= MUTATION_AMOUNT
+                            else:
+                                dictval[k] += MUTATION_AMOUNT
+
+    return ret
                                         
     
 def combine(ind1, ind2):
-    assert(ind1.nAppendages == ind2.nAppendages)
+    assert(isinstance(ind1, Caveman))
+    assert(isinstance(ind2, Caveman))
+    # if ind1.nAppendages == ind2.nAppendages:
+        # import pdb; pdb.set_trace()
     
-    nxt = Caveman(ind1.nAppendages)
+    nxt = Caveman(len(ind1.appendages))
     dict1 = ind1.__dict__
     dict2 = ind2.__dict__
     app1 = dict1['appendages']
@@ -185,26 +193,20 @@ def combine(ind1, ind2):
 def mate(generation):
     return map(combine, generation[0::2], generation[1::2])
 
-nxtGen = fightTournament(population, ROUND_CUTOFF)
-derp = mate(nxtGen)
-
-herp = mutate(derp[0])
-
 def runtrial(numtrials):
+    nextgen = generatePopulation()
     holder = Caveman(NUM_APP)
-    print "nAppendages " + str(holder.nAppendages)
+    print "nAppendages " + str(len(holder.appendages))
     print "hBody " + str(holder.hBody)
     print "arm_height " + str(holder.arm_height)
     print "rBopper " + str(holder.appendages[0].wBopper)
-    print "NUM_POINTS " + str(NUM_POINTS)
-    print "BODY_WEIGHT_PROPORTION " + str(BODY_WEIGHT_PROPORTION)
 
-    for i in numtrials:
-        nextgen = fightTournament(population, ROUND_CUTOFF)
+    for i in xrange(numtrials):
+        nextgen = fightTournament(nextgen, 2**ROUND_CUTOFF)
         
-        print "***Round " + str(i)
+        print "*************************Round " + str(i)
         for k in nextgen:
-            print "wBody " + str(k.wBody)
+            print "---------wBody " + str(k.wBody)
             for j in xrange(len(k.appendages)):
                 d = k.appendages[j]
                 print "Arm " + str(j)
@@ -215,6 +217,12 @@ def runtrial(numtrials):
                 print "wForearm " + str(d.lString)
                 print "wBicep " + str(d.wBicep)
                 print "wBopper " + str(d.wBopper)
+        # import pdb; pdb.set_trace()
         nextgen = mate(nextgen)
-        nextgen = mutate(nextgen, POPULATION_SIZE / (2**ROUND_CUTOFF))
+        nextgen = mutate(nextgen, POPULATION_SIZE / (2**(ROUND_CUTOFF-1)))
+        # print str(len(nextgen))
+
+        # population = nextgen
         
+if __name__ == "__main__":
+    runtrial(2)
