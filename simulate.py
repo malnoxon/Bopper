@@ -5,6 +5,16 @@ import pygame
 from pygame.locals import *
 import GA.Caveman as cm
 import numpy as np
+import sys
+
+def endgame(screen):
+    for i in range(480):
+        pygame.draw.line(screen, (255,0,0), (0,i), (640,0))
+        pygame.draw.line(screen, (255,0,0), (0,480), (640, 480-i))
+        pygame.display.flip()
+        pygame.time.wait(1)
+
+    sys.exit()
 
 def create_caveman(world, x_pos, caveman):
     mbody = world.CreateDynamicBody(position=(x_pos, cm.HEIGHT/2))
@@ -73,13 +83,13 @@ def simulate(caveman1, caveman2, graphics_enabled):
             position=(0, -9),
             shapes=b2PolygonShape(box=(50,10)))
 
-    bodies1_1, bodies1_2 = create_caveman(world, 5, caveman1)
+    bodies1_1, bodies1_2 = create_caveman(world,15, caveman1)
     mbody = bodies1_1[0]
     joint1_1 = bodies1_1[-2:]
     bodies1_1 = bodies1_1[:-2]
     joint1_2 = bodies1_2[-2:]
     bodies1_2 = bodies1_2[:-2]
-    bodies2_1, bodies2_2 = create_caveman(world, 12, caveman2)
+    bodies2_1, bodies2_2 = create_caveman(world, 22, caveman2)
     mbody2 = bodies2_1[0]
     bodies2_1 = bodies2_1[:-2]
     joint2_1 = bodies2_1[-2:]
@@ -100,48 +110,39 @@ def simulate(caveman1, caveman2, graphics_enabled):
     vel_iters = 6
     pos_iters = 2
 
+    total_time = 0
+
     running = True
     while running:
 
-        for b in game_over_bodies1:
-            for contact in b.contacts:
-                if contact.other.userData == 'ground':
-                    if b is not mbody and b is not mbody2:
-                        print "Player 1 loses"
-                    if b is mbody and mbody.worldCenter[1] < 1.001:
-                        print "Player 1 loses"
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    import pdb; pdb.set_trace()
 
-        for b in game_over_bodies2:
-            for contact in b.contacts:
-                if contact.other.userData == 'ground':
-                    if b is not mbody and b is not mbody2:
-                        print "Player 2 loses"
-                        import pdb; pdb.set_trace()
-                    if b is mbody2 and mbody2.worldCenter[1] < 1.001:
-                        print "Player 2 loses"
-                        import pdb; pdb.set_trace()
 
         # import pdb; pdb.set_trace()
         # np.polynomial.polynomial.polyval(1, caveman1.appendages[0].iElbow)
         # Motors for first arm of first robot
         joint1_1[0].maxMotorTorque = 1000
-        joint1_1[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint1_1[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint1_1[0].motorSpeed =2* np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
+        joint1_1[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
 
         #Motors for first arm of 2nd robot
         joint2_1[0].maxMotorTorque = 1000
-        joint2_1[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint2_1[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint2_1[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
+        joint2_1[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
 
         # Motors for second arm of first robot
         joint1_2[0].maxMotorTorque = 1000
-        joint1_2[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint1_2[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint1_2[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
+        joint1_2[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
 
         #Motors for second arm of 2nd robot
         joint2_2[0].maxMotorTorque = 1000
-        joint2_2[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
-        joint2_2[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
+        joint2_2[0].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
+        joint2_2[1].motorSpeed = 2*np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
 
         # print np.polynomial.polynomial.polyval(clock.get_time()*100, caveman1.appendages[0].iElbow)
 
@@ -166,11 +167,37 @@ def simulate(caveman1, caveman2, graphics_enabled):
 
         world.Step(timeStep, vel_iters, pos_iters)
         pygame.display.flip()
+        total_time += clock.get_time()
         clock.tick(FPS)
 
+        for b in game_over_bodies1:
+            for contact in b.contacts:
+                if contact.other.userData == 'ground':
+                    if b is not mbody and b is not mbody2:
+                        print "Player 1 loses"
+                        endgame(screen)
+                    if b is mbody and mbody.worldCenter[1] < 2.03:
+                        print "Player 1 loses"
+                        endgame(screen)
 
-        if clock.get_time() > 100000: #Tie after 100 seconds
-            return "Tie"
+        for b in game_over_bodies2:
+            for contact in b.contacts:
+                if contact.other.userData == 'ground':
+                    if b is not mbody and b is not mbody2:
+                        print "Player 2 loses"
+                        endgame(screen)
+                        # import pdb; pdb.set_trace()
+                    if b is mbody2 and mbody2.worldCenter[1] < 2.03:
+                        print "Player 2 loses"
+                        endgame(screen)
+                        # import pdb; pdb.set_trace()
+
+        if total_time > 200000: #Tie after 100 seconds
+            print "Draw, result returned is:"
+            if mbody.worldCenter[1] > mbody2.worldCentes[1]:
+                print "Player 1 wins"
+            else:
+                print "Player 2 wins"
 
 if __name__ == "__main__":
     simulate(cm.Caveman(2), cm.Caveman(2), True)
