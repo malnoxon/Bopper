@@ -69,15 +69,18 @@ def simulate(caveman1, caveman2, graphics_enabled):
 
     world = b2World()
     groundBody=world.CreateStaticBody(
+            userData="ground",
             position=(0, -9),
             shapes=b2PolygonShape(box=(50,10)))
 
     bodies1_1, bodies1_2 = create_caveman(world, 5, caveman1)
+    mbody = bodies1_1[0]
     joint1_1 = bodies1_1[-2:]
     bodies1_1 = bodies1_1[:-2]
     joint1_2 = bodies1_2[-2:]
     bodies1_2 = bodies1_2[:-2]
     bodies2_1, bodies2_2 = create_caveman(world, 12, caveman2)
+    mbody2 = bodies2_1[0]
     bodies2_1 = bodies2_1[:-2]
     joint2_1 = bodies2_1[-2:]
     bodies2_2 = bodies2_2[:-2]
@@ -89,6 +92,9 @@ def simulate(caveman1, caveman2, graphics_enabled):
     bodies2_1 = bodies2_1[:-1]
     bodies1_2 = bodies1_2[:-1]
     bodies2_2 = bodies2_2[:-1]
+
+    game_over_bodies1 = bodies1_1 + bodies1_2
+    game_over_bodies2 = bodies2_1 + bodies2_2
     
     timeStep = 1.0 / FPS
     vel_iters = 6
@@ -96,6 +102,26 @@ def simulate(caveman1, caveman2, graphics_enabled):
 
     running = True
     while running:
+
+        for b in game_over_bodies1:
+            for contact in b.contacts:
+                if contact.other.userData == 'ground':
+                    if b is not mbody and b is not mbody2:
+                        print "Player 1 loses"
+                    if b is mbody and mbody.worldCenter[1] < 1.001:
+                        print "Player 1 loses"
+
+        for b in game_over_bodies2:
+            for contact in b.contacts:
+                if contact.other.userData == 'ground':
+                    if b is not mbody and b is not mbody2:
+                        print "Player 2 loses"
+                        import pdb; pdb.set_trace()
+                    if b is mbody2 and mbody2.worldCenter[1] < 1.001:
+                        print "Player 2 loses"
+                        import pdb; pdb.set_trace()
+
+        # import pdb; pdb.set_trace()
         # np.polynomial.polynomial.polyval(1, caveman1.appendages[0].iElbow)
         # Motors for first arm of first robot
         joint1_1[0].maxMotorTorque = 1000
@@ -117,29 +143,34 @@ def simulate(caveman1, caveman2, graphics_enabled):
         joint2_2[0].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iShoulder)
         joint2_2[1].motorSpeed = np.polynomial.polynomial.polyval(clock.get_time() % 1, caveman1.appendages[1].iElbow)
 
-        print np.polynomial.polynomial.polyval(clock.get_time()*100, caveman1.appendages[0].iElbow)
-        screen.fill((0,0,0,0))
+        # print np.polynomial.polynomial.polyval(clock.get_time()*100, caveman1.appendages[0].iElbow)
 
-        for body in all_bodies:
-            for fixture in body.fixtures:
-                shape = fixture.shape
-                if body not in boppers:
-                    vertices = [(body.transform*v)*PPM for v in shape.vertices]
-                    vertices = [(v[0], SCREEN_HEIGHT-v[1]) for v in vertices]
+        if graphics_enabled:
+            screen.fill((0,0,0,0))
+            for body in all_bodies:
+                for fixture in body.fixtures:
+                    shape = fixture.shape
+                    if body not in boppers:
+                        vertices = [(body.transform*v)*PPM for v in shape.vertices]
+                        vertices = [(v[0], SCREEN_HEIGHT-v[1]) for v in vertices]
 
-                    if body == groundBody:
-                        pygame.draw.polygon(screen, (0,255,0,255), vertices)
+                        if body == groundBody:
+                            pygame.draw.polygon(screen, (0,255,0,255), vertices)
+                        else:
+                            pygame.draw.polygon(screen, (255,255,255,255), vertices)
+
                     else:
-                        pygame.draw.polygon(screen, (255,255,255,255), vertices)
-
-                else:
-                    pygame_radius = fixture.shape.radius * PPM
-                    pygame_loc = (int(body.position[0] * PPM), int(SCREEN_HEIGHT - body.position[1]*PPM))
-                    pygame.draw.circle(screen, (255,0,0,255), pygame_loc, int(pygame_radius))
+                        pygame_radius = fixture.shape.radius * PPM
+                        pygame_loc = (int(body.position[0] * PPM), int(SCREEN_HEIGHT - body.position[1]*PPM))
+                        pygame.draw.circle(screen, (255,0,0,255), pygame_loc, int(pygame_radius))
 
         world.Step(timeStep, vel_iters, pos_iters)
         pygame.display.flip()
         clock.tick(FPS)
+
+
+        if clock.get_time() > 100000: #Tie after 100 seconds
+            return "Tie"
 
 if __name__ == "__main__":
     simulate(cm.Caveman(2), cm.Caveman(2), True)
