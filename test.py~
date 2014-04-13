@@ -2,8 +2,6 @@ import random as r
 from Caveman import Caveman
 import numpy as np
 import pdb
-import simulate
-import copy
 
 """
 #from deap import base
@@ -70,9 +68,8 @@ def fightTournament(population, numWinners):
 
     chosen = population
     for i in xrange(numrounds):
-        chosen = map(simulate.simulate, chosen[0::2], chosen[1::2], False)
-    
-    
+        chosen = map(evaluate, chosen[0::2], chosen[1::2])
+        #print chosen
     return chosen
 
 """
@@ -95,42 +92,33 @@ def generatePopulation():
 population = generatePopulation()
 
 #does not support combining breeds with a different number of appendages
-#genList is the final population for the round. branchingFactor is the number of copies that each element is made
-def mutate(genList, branchingFactor):
-    assert(powerof(len(genList), 2))
-    assert(powerof(branchingFactor, 2))
-    ret = []
-    for j in len(genList):
-        for i in branchingFactor:
-            ret.append(copy.deepcopy(genList[j]))
-    
-    for nxt in ret:
+#this is nasty code but I'm not going to change it right now. Should just use dict.keys() and dict.items() instead of this eval shit
+def mutate(nxt):
     #the list of appendages in next
-        nextapp = nxt.appendages
-        for j in xrange(len(nextapp)):
-            for i in nextapp[j].__dict__:
-                dictval = eval("nextapp[j]." + i)
-                #if the value in the dictionary is an int or a float, attempt mutation
-                if (isinstance(dictval, float) or isinstance(dictval, int)):
+    nextapp = nxt.appendages
+    for j in xrange(len(nextapp)):
+        for i in nextapp[j].__dict__:
+            dictval = eval("nextapp[j]." + i)
+            #if the value in the dictionary is an int or a float, attempt mutation
+            if (isinstance(dictval, float) or isinstance(dictval, int)):
+                rand = r.random()
+                if rand < MUTATION_RATE:
+                    if r.random() < 0.5:
+                        exec "nextapp[j]." + i + " += MUTATION_AMOUNT"
+                    else:
+                        exec "nextapp[j]." + i + " -=  MUTATION_AMOUNT"
+
+            #if the value in the dictionary is a polynomial, go through the coefficients and mutate them
+            if (isinstance(dictval, np.poly1d)):
+                #len(np.poly1d) returns the mathematical degree, so we add one to make all coefficients available
+                for k in xrange(len(dictval) + 1):
                     rand = r.random()
                     if rand < MUTATION_RATE:
                         if r.random() < 0.5:
-                            exec "nextapp[j]." + i + " += MUTATION_AMOUNT"
+                            dictval[k] -= MUTATION_AMOUNT
                         else:
-                            exec "nextapp[j]." + i + " -=  MUTATION_AMOUNT"
-
-                #if the value in the dictionary is a polynomial, go through the coefficients and mutate them
-                if (isinstance(dictval, np.poly1d)):
-                    #len(np.poly1d) returns the mathematical degree, so we add one to make all coefficients available
-                    for k in xrange(len(dictval) + 1):
-                        rand = r.random()
-                        if rand < MUTATION_RATE:
-                            if r.random() < 0.5:
-                                dictval[k] -= MUTATION_AMOUNT
-                            else:
-                                dictval[k] += MUTATION_AMOUNT
-    return ret
-                            
+                            dictval[k] += MUTATION_AMOUNT
+    
     #going through the fields in nxt.
     nextdict = nxt.__dict__
     for i in nextdict.keys():
@@ -144,16 +132,16 @@ def mutate(genList, branchingFactor):
                         exec "nxt." + i + " -= MUTATION_AMOUNT" 
                     else:
                         exec "nxt." + i + " += MUTATION_AMOUNT"
-                        if (isinstance(dictval, np.poly1d)):
-                            for k in xrange(len(dictval) + 1):
-                                rand = r.random()
-                                if rand < MUTATION_RATE:
-                                    if r.random() < 0.5:
-                                        dictval[k] -= MUTATION_AMOUNT
-                                    else:
-                                        dictval[k] += MUTATION_AMOUNT
-                                        return nxt
-                                        
+            if (isinstance(dictval, np.poly1d)):
+                for k in xrange(len(dictval) + 1):
+                    rand = r.random()
+                    if rand < MUTATION_RATE:
+                        if r.random() < 0.5:
+                            dictval[k] -= MUTATION_AMOUNT
+                        else:
+                            dictval[k] += MUTATION_AMOUNT
+    return nxt
+                    
     
 def combine(ind1, ind2):
     assert(ind1.nAppendages == ind2.nAppendages)
@@ -178,9 +166,9 @@ def combine(ind1, ind2):
                 exec "arm." + str(key) + " = app1[" + str(i) + "]." + key
             else:
                 exec "arm." + str(key) + " = app2[" + str(i) + "]." + key
-                
+        
     return nxt
-    
+            
             
 def mate(generation):
     return map(combine, generation[0::2], generation[1::2])
@@ -191,30 +179,5 @@ derp = mate(nxtGen)
 herp = mutate(derp[0])
 
 def runtrial(numtrials):
-    holder = Caveman(NUM_APP)
-    print "nAppendages " + str(holder.nAppendages)
-    print "hBody " + str(holder.hBody)
-    print "arm_height " + str(holder.arm_height)
-    print "rBopper " + str(holder.appendages[0].wBopper)
-    print "NUM_POINTS " + str(NUM_POINTS)
-    print "BODY_WEIGHT_PROPORTION " + str(BODY_WEIGHT_PROPORTION)
-
     for i in numtrials:
-        nextgen = fightTournament(population, ROUND_CUTOFF)
-        
-        print "***Round " + str(i)
-        for k in nextgen:
-            print "wBody " + str(k.wBody)
-            for j in xrange(len(k.appendages)):
-                d = k.appendages[j]
-                print "Arm " + str(j)
-                print "lForearm " + str(d.lForearm)
-                print "lBicep " + str(d.lBicep)
-                print "rBopper " + str(d.rBopper)
-                print "lString " + str(d.lString)
-                print "wForearm " + str(d.lString)
-                print "wBicep " + str(d.wBicep)
-                print "wBopper " + str(d.wBopper)
-        nextgen = mate(nextgen)
-        nextgen = mutate(nextgen, POPULATION_SIZE / (2**ROUND_CUTOFF))
-        
+        fightTournament(population, ROUND_CUTOFF
