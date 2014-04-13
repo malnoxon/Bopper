@@ -73,13 +73,13 @@ def simulate(caveman1, caveman2, graphics_enabled):
             position=(0, -9),
             shapes=b2PolygonShape(box=(50,10)))
 
-    bodies1_1, bodies1_2 = create_caveman(world, 5, caveman1)
+    bodies1_1, bodies1_2 = create_caveman(world,15, caveman1)
     mbody = bodies1_1[0]
     joint1_1 = bodies1_1[-2:]
     bodies1_1 = bodies1_1[:-2]
     joint1_2 = bodies1_2[-2:]
     bodies1_2 = bodies1_2[:-2]
-    bodies2_1, bodies2_2 = create_caveman(world, 12, caveman2)
+    bodies2_1, bodies2_2 = create_caveman(world, 22, caveman2)
     mbody2 = bodies2_1[0]
     bodies2_1 = bodies2_1[:-2]
     joint2_1 = bodies2_1[-2:]
@@ -103,12 +103,18 @@ def simulate(caveman1, caveman2, graphics_enabled):
     running = True
     while running:
 
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    import pdb; pdb.set_trace()
+
         for b in game_over_bodies1:
             for contact in b.contacts:
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
                         print "Player 1 loses"
-                    if b is mbody and mbody.worldCenter[1] < 1.001:
+                    if b is mbody and mbody.worldCenter[1] < 2.03:
                         print "Player 1 loses"
 
         for b in game_over_bodies2:
@@ -116,10 +122,10 @@ def simulate(caveman1, caveman2, graphics_enabled):
                 if contact.other.userData == 'ground':
                     if b is not mbody and b is not mbody2:
                         print "Player 2 loses"
-                        import pdb; pdb.set_trace()
-                    if b is mbody2 and mbody2.worldCenter[1] < 1.001:
+                        # import pdb; pdb.set_trace()
+                    if b is mbody2 and mbody2.worldCenter[1] < 2.03:
                         print "Player 2 loses"
-                        import pdb; pdb.set_trace()
+                        # import pdb; pdb.set_trace()
 
         # import pdb; pdb.set_trace()
         # np.polynomial.polynomial.polyval(1, caveman1.appendages[0].iElbow)
@@ -169,8 +175,11 @@ def simulate(caveman1, caveman2, graphics_enabled):
         clock.tick(FPS)
 
 
-        if clock.get_time() > 100000: #Tie after 100 seconds
-            return "Tie"
+        if clock.get_time() > 20000: #Tie after 100 seconds
+            if mbody.worldCenter[1] > mbody2.worldCentes[1]:
+                print "Player 1 wins"
+            else:
+                print "Player 2 wins"
 
 if __name__ == "__main__":
     simulate(cm.Caveman(2), cm.Caveman(2), True)
