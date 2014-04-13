@@ -2,7 +2,8 @@ from __future__ import division
 import random as r
 from scipy import interpolate
 import numpy as np
-from deap import base
+
+#from deap import base
 
 MAXIMUM_WEIGHT_CAVEMAN = 5
 HEIGHT = 10
@@ -50,10 +51,11 @@ class Appendage:
         #set elasticiy
         self.elasticity = r.random()
 
-class Caveman(base.Fitness):    
+class Caveman():
+    
     def __init__(self, numApp):
 
-        # self.weights = w
+        self.weights = (1,)
         self.nAppendages = numApp
         self.hBody = HEIGHT
 
